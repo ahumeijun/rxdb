@@ -1,6 +1,6 @@
 //var RxDB = require('../../'); // TODO use this
 require('babel-polyfill');
-const RxDB = require('../../');
+const RxDB = require('rxdb');
 RxDB.plugin(require('pouchdb-adapter-websql'));
 RxDB.plugin(require('pouchdb-adapter-http'));
 RxDB.plugin(require('pouchdb-replication'));
@@ -26,6 +26,26 @@ const heroSchema = {
     required: ['color']
 };
 
+const heroSchemaV1 = {
+    title: 'hero schema',
+    description: 'describes a simple hero',
+    version: 1,
+    type: 'object',
+    properties: {
+        name: {
+            type: 'string',
+            primary: true
+        },
+        color: {
+            type: 'string'
+        },
+        level: {
+            type: 'string'
+        }
+    },
+    required: ['color']
+};
+
 console.log('hostname: ' + window.location.hostname);
 const syncURL = 'http://' + window.location.hostname + ':10102/';
 
@@ -40,40 +60,30 @@ RxDB
     .then(function(db) {
         console.log('creating hero-collection..');
         database = db;
+        //use this version first time
         return db.collection({
             name: 'heroes',
             schema: heroSchema
         });
+        //user v1 version next time, migration strategies function will be infinite
+        // return db.collection({
+        //     name: 'heroes',
+        //     schema: heroSchemaV1,
+        //     migrationStrategies: {
+        //         1: (oldDoc) => {
+        //             console.log('migrate from 0 to 1...' + oldDoc.name)
+        //             oldDoc.level = 'ss'
+        //             return oldDoc
+        //         }
+        //     }
+        // });
     })
     .then(function(col) {
-
-        // sync
-        console.log('starting sync');
-        database.heroes.sync({
-            remote: syncURL + 'hero/'
-        });
-
-        col.find()
-            .sort({
-                name: 1
-            })
-            .$.subscribe(function(heroes) {
-                if (!heroes) {
-                    heroesList.innerHTML = 'Loading..';
-                    return;
-                }
-                console.log('observable fired');
-                console.dir(heroes);
-
-                heroesList.innerHTML = heroes
-                    .map(hero => {
-                        return '<li>' +
-                            '<div class="color-box" style="background:' + hero.color + '"></div>' +
-                            '<div class="name">' + hero.name + '</div>' +
-                            '</li>';
-                    })
-                    .reduce((pre, cur) => pre += cur, '');
-            });
+        col.insert({
+            name: 'Niven',
+            color: 'black'
+        })
+        console.log('insert niven')
     });
 
 addHero = function() {

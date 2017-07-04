@@ -30,7 +30,7 @@ function createWindow() {
 
 app.on('ready', function() {
     createWindow();
-    createWindow();
+    // createWindow();
 });
 
 app.on('window-all-closed', function() {
