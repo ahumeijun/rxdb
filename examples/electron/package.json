@@ -4,7 +4,7 @@
   "main": "main.js",
   "scripts": {
     "start": "concurrently \"npm run server\" \"npm run electron\"",
-    "electron": "electron .",
+    "electron": "electron . --enable-logging",
     "server": "pouchdb-server --host 0.0.0.0 -p 10102 -m -d /tmp/pouchdb-server/ -n true"
   },
   "dependencies": {
@@ -19,6 +19,7 @@
     "pouchdb-adapter-websql": "6.2.0",
     "pouchdb-replication": "6.2.0",
     "pouchdb-server": "2.3.7",
+    "rxdb": "^5.0.0",
     "rxjs": "5.4.1"
   }
 }
